@@ -18,11 +18,16 @@ import lombok.Data;
 public class User {
     @Id
     private ObjectId id;
-    @Indexed(unique=true)
+
+    // here this indexing doesnt work direct we have to add some code manually 
+    // but we can do with springboot also in the applications properties
+    @Indexed(unique=true)   
     @NonNull
-    private String name ;
+    private String userName ;
+
     @NonNull
     private String password;
+
     @DBRef
     private List<JournalEntry> journalEntries = new ArrayList<>();
 
