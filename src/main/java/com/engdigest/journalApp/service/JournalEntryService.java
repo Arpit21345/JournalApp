@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.engdigest.journalApp.entity.JournalEntry;
+import com.engdigest.journalApp.entity.User;
 import com.engdigest.journalApp.repository.JournalEntryRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,30 +18,41 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class  JournalEntryService {
     @Autowired
-    private JournalEntryRepository repository;
+    private JournalEntryRepository journalEntryRepository;
 
-     public void saveEntry(JournalEntry journalEntry){
+     @Autowired
+      private UserService userService;
+
+
+// here saving it at two plces then adding in user also 
+     public void saveEntry(JournalEntry journalEntry, String userName){
          try{
+              User user = userService.findByUserName(userName);
             journalEntry.setDate(LocalDateTime.now());
-            repository.save(journalEntry);
+            JournalEntry saved = journalEntryRepository.save(journalEntry);
+            user.getJournalEntries().add(saved);
+            userService.saveEntry(user);
          }
          catch(Exception e){
             log.error("Exception" , e);
          }
-        repository.save(journalEntry);
+        journalEntryRepository.save(journalEntry);
         
      }
 
      public List<JournalEntry> getAll(){
-        return repository.findAll();
+        return journalEntryRepository.findAll();
      }
 
      public Optional<JournalEntry> findById(ObjectId id){
-      return repository.findById(id);
+      return journalEntryRepository.findById(id);
      }
 
-     public void deleteById(ObjectId id){
-      repository.deleteById(id);
+     public void deleteById(ObjectId id , String userName){
+       User user = userService.findByUserName(userName);
+       user.getJournalEntries().removeIf(x -> x.getId().equals((id)));
+       userService.saveEntry(user);
+      journalEntryRepository.deleteById(id);
      }
 }
 // controller call - --->service  calls --->repositriy

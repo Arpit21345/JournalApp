@@ -1,4 +1,4 @@
-package com.engdigest.journalApp.controller;
+package com.engdigest.health;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
